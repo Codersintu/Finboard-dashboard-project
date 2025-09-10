@@ -5,7 +5,7 @@ import {motion} from "motion/react";
 
 function Navbar() {
   return (
-    <div className="w-[100vw] h-[70px] bg-gray-900 shadow-2xs overflow-hidden flex items-center border-b border-b-gray-100">
+    <div className="w-[100vw] h-[70px] bg-gray-900 shadow-2xs overflow-hidden flex items-center border-b border-b-gray-500">
       <div className="w-[100vw] mx-[80px]">
         <div className="flex justify-between items-center">
           {/* left side widget */}
