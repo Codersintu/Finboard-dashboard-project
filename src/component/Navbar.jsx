@@ -2,10 +2,9 @@ import React from "react";
 import candle from "../assets/candle.png";
 import plus from "../assets/plus.png";
 import {motion} from "motion/react";
-
-function Navbar() {
+function Navbar({setOpen,open}) {
   return (
-    <div className="w-[100vw] h-[70px] bg-gray-900 shadow-2xs overflow-hidden flex items-center border-b border-b-gray-500">
+    <div className="w-[100vw] h-[70px] sticky top-0 z-[999] bg-gray-900 shadow-2xs overflow-hidden flex items-center border-b border-b-gray-500">
       <div className="w-[100vw] mx-[80px]">
         <div className="flex justify-between items-center">
           {/* left side widget */}
@@ -25,6 +24,7 @@ function Navbar() {
             <motion.button
               initial={{ scale: 1 }}
               whileTap={{ scale: 0.95 }}
+              onClick={()=>setOpen(true)}
               className=" bg-green-700 px-3 py-2 rounded-xl cursor-pointer hover:bg-green-600"
             >
               <div className="flex items-center gap-3 text-white font-semibold">
