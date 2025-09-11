@@ -1,9 +1,13 @@
 import React from 'react'
 import candle from "../../assets/candle.png";
+import { useRecoilValue } from 'recoil';
+import { widgetAPI } from '../../store';
 
 function Home() {
+  const apiData=useRecoilValue(widgetAPI)
+  console.log("hello",apiData)
   return (
-    <div className='w-[100vw] relative z-0 h-[700px] bg-gray-600 flex justify-center'>
+    <div className='w-[100vw] relative z-0 h-[1000px] bg-gray-600 flex justify-center'>
      <div className="flex flex-col items-center gap-5 mt-[60px]">
         <div className="bg-gray-800 p-4 rounded-full">
         <img className='w-[25px]' src={candle} alt="" />

@@ -2,31 +2,40 @@
 import { atom, selectorFamily } from "recoil";
 import axios from "axios";
 
-export const widgetAPI = atom({
-  key: "API", // default storage of last tested URL
+export const widgetUrl = atom({
+  key: "url", 
   default: "",
+});
+export const widgetAPI=atom({
+  key:"api",
+  default:","
+})
+export const widgettested = atom({
+  key: "tested",
+  default: false,
 });
 
 export const widgetName = atom({
-  key: "Name", // default storage of last tested URL
+  key: "Name",
   default: "",
 });
 export const widgetsecond = atom({
-  key: "intersecond", // default storage of last tested URL
+  key: "intersecond",
   default: "",
 });
 
 
-export const widgetData = selectorFamily({
-  key: "APISelector",
-  get: ({ url,enabled }) => async () => {
-    if (!url || !enabled) return null;
-    try {
-      const res = await axios.get(url);
-      return res.data;
-    } catch (err) {
-      return res.text("request failed")
-    }
-  },
-});
+
+// export const widgetData = selectorFamily({
+//   key: "APISelector",
+//   get: ({ url,enabled }) => async ({get}) => {
+//     try {
+//           if (!url || !enabled) return null;
+//       const res = await axios.get(url);
+//       return res.data;
+//     } catch (err) {
+//       throw new Error("Request failed");
+//     }
+//   },
+// });
 

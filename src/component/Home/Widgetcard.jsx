@@ -2,17 +2,19 @@ import React, { useEffect, useState } from "react";
 import cancel from "../../assets/cancel.png";
 import test from "../../assets/test.png";
 import { motion } from "motion/react";
-import { useRecoilState, useRecoilValue, useRecoilValueLoadable } from "recoil";
-import { widgetAPI, widgetData, widgetName, widgetsecond } from "../../store";
+import { useRecoilState, useRecoilValue} from "recoil";
+import { widgetAPI,  widgetName, widgetsecond, widgettested, widgetUrl } from "../../store";
+import axios from "axios";
 function Widgetcard({ setOpen, open }) {
-  const [url, setUrl] = useRecoilState(widgetAPI);
+  const [url, setUrl] = useRecoilState(widgetUrl);
+  const [apiData,setApiData]=useRecoilState(widgetAPI)
   const [Name, setName] = useRecoilState(widgetName);
   const [intersec, setIntersec] = useState(widgetsecond);
-  const [errormsg, setErrormsg] = useState("");
-  const [tested, setTested] = useState(false);
+  const [tested, setTested] = useRecoilState(widgettested);
   const [displayMode, setDisplayMode] = useState(null);
-  const apiData = useRecoilValueLoadable(widgetData({ url, enabled: tested }));
-
+  const [Error,setError]=useState("")
+  const ApiData=useRecoilValue(widgetAPI)
+  console.log("APIDATA",ApiData)
   function isValidUrl(string) {
     try {
       new URL(string); // agar ye chale to URL valid hai
@@ -22,14 +24,25 @@ function Widgetcard({ setOpen, open }) {
     }
   }
 
-  const Handletest = (e) => {
+  const Handletest = async(e) => {
     e.preventDefault();
     if (!isValidUrl(url)) {
       alert("❌ Please enter a valid URL (must start with http/https)");
       return;
     }
+    
+    
+   try {
+    const resp=await axios.get(url);
+    setError("✅ API succesfully connected")
+    setApiData(resp.data);
+    console.log("res.data",resp.data)
+    setTested(true)
+   } catch (error) {
+     setError("❌ API connection failed. Check URL.");
+    setApiData(null);
+   }
 
-    setTested(true);
   };
 
   return (
@@ -78,7 +91,8 @@ function Widgetcard({ setOpen, open }) {
                   value={url}
                   onChange={(e) => {
                     setUrl(e.target.value);
-                    setTested(false);
+                    setError("")
+                    setTested(false)
                   }}
                   placeholder="https://api..."
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
@@ -96,17 +110,9 @@ function Widgetcard({ setOpen, open }) {
               </div>
 
               {/* Test Result */}
-              {tested && apiData.state === "loading" && (
-                <p className="text-yellow-500 mt-2">Testing API...</p>
-              )}
-              {tested && apiData.state === "hasValue" && (
-                <p className="text-green-600 mt-2">
-                  ✅ API connection successful!
-                </p>
-              )}
-              {tested && apiData.state === "hasError" && (
-                <p className="text-red-600 mt-2">
-                  ❌ API connection failed. Check URL.
+              {Error && (
+                <p className=" mt-2">
+                  {Error}
                 </p>
               )}
             </div>
@@ -127,7 +133,7 @@ function Widgetcard({ setOpen, open }) {
             </div>
 
             {/* Display Mode (after successful test) */}
-            {tested && apiData.state === "hasValue" && (
+            {tested==true && (
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Display Mode
@@ -150,6 +156,38 @@ function Widgetcard({ setOpen, open }) {
                 </div>
               </div>
             )}
+
+             <div>
+              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Search Field
+              </label>
+              <input
+                type="text"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
+                placeholder="Search Field..."
+              />
+            </div>
+
+
+            <div>
+              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Available Field
+              </label>
+              <div className="bg-gray-800 h-[100px] rounded-xs p-2 overflow-y-scroll flex flex-col gap-4">
+                <div className="flex justify-between items-center p-2 hover:bg-gray-600 cursor-pointer">
+                  <div className="flex flex-col">
+                    <h1 className="text-white text-xl font-semibold">apiData</h1>
+                    <div className="flex items-center gap-1">
+                      <p className="text-white">string</p>
+                      <span className="text-white">|</span>
+                      <p className="text-white">90.45637737473</p>
+                    </div>
+                  </div>
+                  <div className="text-white text-2xl"><p>+</p></div>
+                </div>
+              </div>
+            </div>
+
 
             <span className="w-full border border-gray-300 flex"></span>
 
