@@ -3,31 +3,37 @@ import cancel from "../../assets/cancel.png";
 import test from "../../assets/test.png";
 import { motion } from "motion/react";
 import { useRecoilState, useRecoilValue, useRecoilValueLoadable } from "recoil";
-import { widgetAPI, widgetData } from "../../store";
+import { widgetAPI, widgetData, widgetName, widgetsecond } from "../../store";
 function Widgetcard({ setOpen, open }) {
-     const [url, setUrl] = useRecoilState(widgetAPI); // save URL globally
-     const [intersec,setIntersec]=useState(30);
-    const apiData = useRecoilValueLoadable(widgetData({ url }));
-    console.log(apiData)
-    const [displayMode, setDisplayMode] = useState(null);
-     console.log(url)
-   
-    const Handletest = (e) => {
-    e.preventDefault();
-     useEffect(()=>{
-        if (!url) return;
-    const interval = setInterval(() => {
-      setUrl((prev) => prev); // retriggers selector
-    }, intersec * 1000);
-    return () => clearInterval(interval);
-    },[url,intersec])
+  const [url, setUrl] = useRecoilState(widgetAPI);
+  const [Name, setName] = useRecoilState(widgetName);
+  const [intersec, setIntersec] = useState(widgetsecond);
+  const [errormsg, setErrormsg] = useState("");
+  const [tested, setTested] = useState(false);
+  const [displayMode, setDisplayMode] = useState(null);
+  const apiData = useRecoilValueLoadable(widgetData({ url, enabled: tested }));
 
+  function isValidUrl(string) {
+    try {
+      new URL(string); // agar ye chale to URL valid hai
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  const Handletest = (e) => {
+    e.preventDefault();
+    if (!isValidUrl(url)) {
+      alert("❌ Please enter a valid URL (must start with http/https)");
+      return;
+    }
+
+    setTested(true);
   };
 
-
-
   return (
-     <>
+    <>
       {open && (
         <div className="w-full max-w-2xl p-3 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 z-10 absolute top-[250px] left-0 m-auto right-0">
           <form className="space-y-5">
@@ -53,6 +59,8 @@ function Widgetcard({ setOpen, open }) {
               </label>
               <input
                 type="text"
+                value={Name}
+                onChange={(e) => setName(e.target.value)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
                 placeholder="e.g, Bitcoin Price Tracker"
                 required
@@ -66,9 +74,12 @@ function Widgetcard({ setOpen, open }) {
               </label>
               <div className="flex items-center gap-3">
                 <input
-                  type="text"
+                  type="url"
                   value={url}
-                  onChange={(e) => setUrl(e.target.value)}
+                  onChange={(e) => {
+                    setUrl(e.target.value);
+                    setTested(false);
+                  }}
                   placeholder="https://api..."
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
                   required
@@ -85,15 +96,15 @@ function Widgetcard({ setOpen, open }) {
               </div>
 
               {/* Test Result */}
-              {apiData.state === "loading" && (
+              {tested && apiData.state === "loading" && (
                 <p className="text-yellow-500 mt-2">Testing API...</p>
               )}
-              {apiData.state === "hasValue" && (
+              {tested && apiData.state === "hasValue" && (
                 <p className="text-green-600 mt-2">
                   ✅ API connection successful!
                 </p>
               )}
-              { apiData.state === "hasError" && (
+              {tested && apiData.state === "hasError" && (
                 <p className="text-red-600 mt-2">
                   ❌ API connection failed. Check URL.
                 </p>
@@ -116,7 +127,7 @@ function Widgetcard({ setOpen, open }) {
             </div>
 
             {/* Display Mode (after successful test) */}
-            {apiData.state === "hasValue" && (
+            {tested && apiData.state === "hasValue" && (
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Display Mode

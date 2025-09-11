@@ -7,15 +7,25 @@ export const widgetAPI = atom({
   default: "",
 });
 
+export const widgetName = atom({
+  key: "Name", // default storage of last tested URL
+  default: "",
+});
+export const widgetsecond = atom({
+  key: "intersecond", // default storage of last tested URL
+  default: "",
+});
+
+
 export const widgetData = selectorFamily({
   key: "APISelector",
-  get: ({ url }) => async () => {
-    if (!url) return null;
+  get: ({ url,enabled }) => async () => {
+    if (!url || !enabled) return null;
     try {
-      const res = await axios.get(`https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=BTC&to_currency=EUR&apikey=${T6B66GTMUHA3SVBY}`);
+      const res = await axios.get(url);
       return res.data;
     } catch (err) {
-      throw err;
+      return res.text("request failed")
     }
   },
 });
